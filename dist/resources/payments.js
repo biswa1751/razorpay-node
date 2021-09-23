@@ -134,6 +134,22 @@ module.exports = function (api) {
       return api.get({
         url: '/payments/' + paymentId + '/bank_transfer'
       }, callback);
+    },
+
+    // DOCS: https://razorpay.com/docs/api/recurring-payments/upi/subsequent-payments/
+    createRecurring: function createRecurring() {
+      var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var callback = arguments[1];
+      var url = "/payments/create/recurring",
+          notes = params.notes,
+          rest = _objectWithoutProperties(params, ['notes']),
+          data = Object.assign(rest, normalizeNotes(notes));
+
+
+      return api.post({
+        url: url,
+        data: data
+      }, callback);
     }
   };
 };

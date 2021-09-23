@@ -5,7 +5,7 @@ const { assert } = chai
 const rzpInstance = require('../razorpay')
 const mocker = require('../mocker')
 const equal = require('deep-equal')
-const { getDateInSecs } = require('../../dist/utils/razorpay-utils')
+const { getDateInSecs ,normalizeNotes} = require('../../dist/utils/razorpay-utils')
 
 const { runCommonTests }  = require("../../dist/utils/predefined-tests.js");
 
@@ -270,4 +270,37 @@ describe('PAYMENTS', () => {
       expectedUrl: `/v1/payments/${TEST_PAYMENT_ID}/bank_transfer`
     });
   })
+    describe("Payment Create Recurring", () => {
+      it("Create recurring payment", (done) => {
+          let params = {
+              param1: "something",
+              param2: "something else",
+              notes: { something: "something else" },
+            },
+            expectedParams = {
+              param1: params.param1,
+              param2: params.param2,
+              ...normalizeNotes(params.notes),
+            };
+        mocker.mock({
+          url: `/payments/create/recurring`,
+          method: "POST",
+        });
+
+        rzpInstance.payments
+          .createRecurring(params)
+          .then((response) => {
+            assert.equal(
+              response.__JUST_FOR_TESTS__.url,
+              "/v1/payments/create/recurring",
+              "Create Recurring Payment URL formed"
+            );
+            assert.ok(
+              equal(response.__JUST_FOR_TESTS__.requestBody,expectedParams),
+              "Correct params are passed in request body"
+            );
+            done();
+          });
+      });
+    });
 })
